@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -43,6 +44,44 @@ public class AvitoTradingGrabberService implements Grabber {
         cookieMap.putAll(response.cookies());
 
         return response.parse();
+    }
+
+
+    /**
+     * Получить кол-во страниц
+     *
+     * @param url ссылка на страницу
+     * @return кол-во страниц
+     */
+    @Override
+    public int getTotalPages(String url) {
+        int totalPages;
+        try {
+            Document document = getDocument(url);
+            Element pageCountDiv = document.getElementsByClass("pagination-pages").first();
+            if (pageCountDiv != null) {
+                Element pageCountHref = pageCountDiv.getElementsByClass("pagination-pages").last();
+                if (pageCountHref != null) {
+                    String pCount = pageCountHref.getElementsByAttribute("href").last()
+                            .getElementsByAttribute("href").get(0).attr("href")
+                            .split("=")[1].split("&")[0];
+                    try {
+                        totalPages = Integer.parseInt(pCount);
+                        return totalPages;
+                    } catch (NumberFormatException e) {
+                        log.error("Не удалось преобразовать полученный текст [{}] в кол-во объявлений. Ошибка: {}", pCount, e.getLocalizedMessage());
+                        return 0;
+                    }
+                }
+
+            } else {
+                return 1;
+            }
+            return 0;
+        } catch (Exception e) {
+            log.error(String.format("Произошла ошибка: %s", e.getLocalizedMessage()));
+            return 0;
+        }
     }
 
     private String switchUserAgent(int number) {

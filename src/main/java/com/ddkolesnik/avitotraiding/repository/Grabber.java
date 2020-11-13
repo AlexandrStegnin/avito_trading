@@ -12,4 +12,6 @@ public interface Grabber {
 
     Document getDocument(String url) throws IOException;
 
+    int getTotalPages(String url);
+
 }
