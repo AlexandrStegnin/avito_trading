@@ -84,6 +84,12 @@ public class AvitoTradingGrabberService implements Grabber {
         }
     }
 
+    /**
+     * Сменить пользовательский браузер
+     *
+     * @param number рандомное число
+     * @return рандомный браузер
+     */
     private String switchUserAgent(int number) {
         String[] agents = {"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"};
