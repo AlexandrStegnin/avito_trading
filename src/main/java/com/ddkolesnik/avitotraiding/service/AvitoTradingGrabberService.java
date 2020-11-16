@@ -2,7 +2,7 @@ package com.ddkolesnik.avitotraiding.service;
 
 import com.ddkolesnik.avitotraiding.model.TradingEntity;
 import com.ddkolesnik.avitotraiding.repository.Grabber;
-import com.ddkolesnik.avitotraiding.utils.City;
+import com.ddkolesnik.avitotraiding.utils.Company;
 import com.ddkolesnik.avitotraiding.utils.UrlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -163,6 +162,37 @@ public class AvitoTradingGrabberService implements Grabber {
             } catch (InterruptedException exception) {
                 log.error(String.format("Произошла ошибка: [%s]", exception));
             }
+        }
+    }
+
+    /**
+     * Получить информацию об объявлении со страницы
+     *
+     * @param url ссылка на страницу с объявлением
+     * @param company компания продавец
+     */
+    public void parseTrading(String url, Company company) {
+        url = "https://www.avito.ru" + url;
+        String link = url;
+        TradingEntity tradingEntity;
+        try {
+            Document document = getDocument(url);
+            String address = getAddress(document);
+            String title = getTitle(document);
+            if (title == null) {
+                return;
+            }
+            tradingEntity = new TradingEntity();
+            tradingEntity.setLot(title);
+            tradingEntity.setUrl(link);
+            tradingEntity.setPrice(getPrice(document));
+            tradingEntity.setAddress(address);
+            tradingEntity.setDescription(getDescription(document));
+            tradingEntity.setSeller(company.getTitle());
+        } catch (HttpStatusException e) {
+            waiting(e);
+        } catch (IOException e) {
+            log.error(String.format("Произошла ошибка: [%s]", e));
         }
     }
 
