@@ -14,4 +14,6 @@ public interface Grabber {
 
     int getTotalPages(String url);
 
+    int parse(String company, String city);
+
 }

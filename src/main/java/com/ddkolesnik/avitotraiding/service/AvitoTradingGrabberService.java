@@ -24,6 +24,11 @@ public class AvitoTradingGrabberService implements Grabber {
     private final Map<String, String> cookieMap = new HashMap<>();
 
     @Override
+    public int parse(String company, String city) {
+        return 0;
+    }
+
+    @Override
     public Document getDocument(String url) throws IOException {
         long timer = 6_000;
         try {
