@@ -80,4 +80,7 @@ public class TradingEntity extends AbstractEntity {
     @Column(name = "price")
     private BigDecimal price;
 
+    @Column(name = "seller")
+    private String seller;
+
 }
