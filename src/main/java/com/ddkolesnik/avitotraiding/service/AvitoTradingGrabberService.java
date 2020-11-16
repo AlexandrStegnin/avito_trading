@@ -45,7 +45,7 @@ public class AvitoTradingGrabberService implements Grabber {
             pageNumber++;
         }
         log.info("Итого собрано ссылок [{} шт]", links.size());
-        return 0;
+        return getTradings(links, Company.fromSystemName(company));
     }
 
     @Override
