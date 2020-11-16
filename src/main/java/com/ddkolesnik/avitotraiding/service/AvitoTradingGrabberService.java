@@ -7,10 +7,13 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -88,6 +91,34 @@ public class AvitoTradingGrabberService implements Grabber {
             log.error(String.format("Произошла ошибка: %s", e.getLocalizedMessage()));
             return 0;
         }
+    }
+
+    /**
+     * Собрать ссылки на объявления со страницы
+     *
+     * @param url            ссылка на страницу
+     * @return список ссылок на объявления
+     */
+    public List<String> getLinks(String url) {
+        List<String> links = new ArrayList<>();
+        Document document;
+        try {
+            document = getDocument(url);
+            Elements aSnippetLinks = document.select("a.snippet-link");
+            for (Element element : aSnippetLinks) {
+                Elements el = element.getElementsByAttributeValue("itemprop", "url");
+                String href = el.select("a[href]").attr("href");
+                if (!href.trim().isEmpty()) {
+                    links.add(href.trim());
+                }
+            }
+        } catch (HttpStatusException e) {
+            waiting(e);
+        } catch (IOException e) {
+            log.error(String.format("Произошла ошибка: [%s]", e));
+            return links;
+        }
+        return links;
     }
 
     /**
