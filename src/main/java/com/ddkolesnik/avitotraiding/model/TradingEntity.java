@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
+import java.math.BigDecimal;
 
 /**
  * @author Alexandr Stegnin
@@ -76,7 +77,7 @@ public class TradingEntity extends AbstractEntity {
     /**
      * Стоимость
      */
-    @Column(name = "cost")
-    private String cost;
+    @Column(name = "price")
+    private BigDecimal price;
 
 }
