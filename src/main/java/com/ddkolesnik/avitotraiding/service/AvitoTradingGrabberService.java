@@ -1,6 +1,9 @@
 package com.ddkolesnik.avitotraiding.service;
 
+import com.ddkolesnik.avitotraiding.model.TradingEntity;
 import com.ddkolesnik.avitotraiding.repository.Grabber;
+import com.ddkolesnik.avitotraiding.utils.City;
+import com.ddkolesnik.avitotraiding.utils.UrlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
@@ -11,6 +14,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +33,17 @@ public class AvitoTradingGrabberService implements Grabber {
 
     @Override
     public int parse(String company, String city) {
+        String url = UrlUtils.getUrl(company, city);
+        List<String> links = new ArrayList<>();
+        int totalPages = getTotalPages(url);
+        String pagePart = "&p=";
+        int pageNumber = 1;
+        while (pageNumber <= totalPages) {
+            log.info("Собираем ссылки со страницы {} из {}", pageNumber, totalPages);
+            links.addAll(getLinks(url.concat(pagePart).concat(String.valueOf(pageNumber))));
+            pageNumber++;
+        }
+        log.info("Итого собрано ссылок [{} шт]", links.size());
         return 0;
     }
 
@@ -148,6 +163,21 @@ public class AvitoTradingGrabberService implements Grabber {
                 log.error(String.format("Произошла ошибка: [%s]", exception));
             }
         }
+    }
+
+    /**
+     * Получить адрес объекта
+     *
+     * @param document HTML страница
+     * @return адрес объекта
+     */
+    private String getAddress(Document document) {
+        String address = null;
+        Element addressEl = document.select("span.item-address__string").first();
+        if (addressEl != null) {
+            address = addressEl.text().trim();
+        }
+        return address;
     }
 
 }
