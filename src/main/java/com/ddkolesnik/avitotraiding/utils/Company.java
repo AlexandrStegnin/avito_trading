@@ -26,4 +26,14 @@ public enum Company {
     public String getSystemName() {
         return systemName;
     }
+
+    public static Company fromSystemName(String systemName) {
+        for (Company company : values()) {
+            if (company.getSystemName().equalsIgnoreCase(systemName)) {
+                return company;
+            }
+        }
+        return SBER;
+    }
+
 }
