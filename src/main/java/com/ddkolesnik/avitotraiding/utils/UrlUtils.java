@@ -19,7 +19,7 @@ public class UrlUtils {
      * @param company компания (Сбер, Открытие, Ростелеком)
      * @return ссылка на страницу объявлений
      */
-    private String getUrl(String company, String city) {
+    public static String getUrl(String company, String city) {
         String mainPart = "https://www.avito.ru/";
         String withCompany = mainPart.concat(company);
         String middlePart = withCompany.concat("/rossiya/kommercheskaya_nedvizhimost?q=");
