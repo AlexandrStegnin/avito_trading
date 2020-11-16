@@ -3,6 +3,7 @@ package com.ddkolesnik.avitotraiding.service;
 import com.ddkolesnik.avitotraiding.repository.Grabber;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -99,6 +100,23 @@ public class AvitoTradingGrabberService implements Grabber {
         String[] agents = {"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"};
         return agents[number];
+    }
+
+    /**
+     * Метод для ожидания, в случае, если сервер сказал, что мы "спамим"
+     *
+     * @param e ошибка
+     */
+    private void waiting(HttpStatusException e) {
+        if (e.getStatusCode() == 429) {
+            log.error("Слишком много запросов {}", e.getLocalizedMessage());
+            log.info("Засыпаем на 60 мин для обхода блокировки");
+            try {
+                Thread.sleep(60 * 1000 * 60);
+            } catch (InterruptedException exception) {
+                log.error(String.format("Произошла ошибка: [%s]", exception));
+            }
+        }
     }
 
 }
