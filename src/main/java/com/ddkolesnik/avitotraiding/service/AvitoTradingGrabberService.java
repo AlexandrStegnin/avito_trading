@@ -180,4 +180,19 @@ public class AvitoTradingGrabberService implements Grabber {
         return address;
     }
 
+    /**
+     * Получить описание объявления
+     *
+     * @param document HTML страница
+     * @return описание объявления
+     */
+    private String getDescription(Document document) {
+        String description = "";
+        Element descriptionEl = document.selectFirst("div.item-description");
+        if (descriptionEl != null) {
+            description = descriptionEl.text().trim();
+        }
+        return description;
+    }
+
 }
