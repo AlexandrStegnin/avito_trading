@@ -195,4 +195,19 @@ public class AvitoTradingGrabberService implements Grabber {
         return description;
     }
 
+    /**
+     * Получаем название объявления
+     *
+     * @param document HTML страница
+     * @return название объявления
+     */
+    private String getTitle(Document document) {
+        String title = null;
+        Element titleEl = document.select("span.title-info-title-text").first();
+        if (titleEl != null) {
+            title = titleEl.text();
+        }
+        return title;
+    }
+
 }
