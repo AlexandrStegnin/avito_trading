@@ -14,6 +14,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -208,6 +209,22 @@ public class AvitoTradingGrabberService implements Grabber {
             title = titleEl.text();
         }
         return title;
+    }
+
+    /**
+     * Получить стоимость объекта
+     *
+     * @param document HTML страница
+     * @return стоимость объявления
+     */
+    private BigDecimal getPrice(Document document) {
+        BigDecimal price = BigDecimal.ZERO;
+        Element priceEl = document.select("span.js-item-price").select("[itemprop=price]").first();
+        if (priceEl != null) {
+            String priceStr = priceEl.text().replaceAll("\\s", "");
+            price = new BigDecimal(priceStr);
+        }
+        return price;
     }
 
 }
