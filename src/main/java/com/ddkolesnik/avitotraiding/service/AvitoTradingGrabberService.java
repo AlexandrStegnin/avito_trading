@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Alexandr Stegnin
@@ -255,6 +256,23 @@ public class AvitoTradingGrabberService implements Grabber {
             price = new BigDecimal(priceStr);
         }
         return price;
+    }
+
+    /**
+     * Получить список объявлений из массива ссылок
+     *
+     * @param urls ссылки на объявления
+     * @param company компания продавец
+     */
+    public int getTradings(List<String> urls, Company company) {
+        int linksCount = urls.size();
+        AtomicInteger counter = new AtomicInteger(0);
+        urls.forEach(url -> {
+            log.info("Собираем {} из {} объявлений", counter.get() + 1, linksCount);
+            parseTrading(url, company);
+            counter.getAndIncrement();
+        });
+        return linksCount;
     }
 
 }
