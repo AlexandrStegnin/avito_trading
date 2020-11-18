@@ -1,6 +1,5 @@
 package com.ddkolesnik.avitotraiding.model;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 public class AbstractEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "creation_time")
