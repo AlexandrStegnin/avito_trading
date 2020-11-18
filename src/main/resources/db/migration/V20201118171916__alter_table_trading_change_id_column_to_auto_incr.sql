@@ -1,0 +1,2 @@
+ALTER TABLE trading DROP COLUMN id;
+ALTER TABLE trading ADD id SERIAL;
