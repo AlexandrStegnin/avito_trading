@@ -23,7 +23,7 @@ public class UrlUtils {
                 .concat(company.getSystemName())
                 .concat("/rossiya/kommercheskaya_nedvizhimost/")
                 .concat("prodam-ASgBAgICAUSwCNJW?f=ASgBAgICAkSwCNJW8hKg2gE")
-                .concat("&q=").concat(city.getName()).concat("&s=104")
+                .concat("&q=").concat(city.getUrlEncoded()).concat("&s=104")
                 .concat("&sellerId=").concat(company.getSellerId());
     }
 
