@@ -30,7 +30,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class AvitoTradingGrabberService implements Grabber {
 
+    private final TradingService tradingService;
+
     private final Map<String, String> cookieMap = new HashMap<>();
+
+    public AvitoTradingGrabberService(TradingService tradingService) {
+        this.tradingService = tradingService;
+    }
 
     @Override
     public int parse(String company, String city) {
@@ -190,6 +196,7 @@ public class AvitoTradingGrabberService implements Grabber {
             tradingEntity.setAddress(address);
             tradingEntity.setDescription(getDescription(document));
             tradingEntity.setSeller(company.getTitle());
+            tradingService.create(tradingEntity);
         } catch (HttpStatusException e) {
             waiting(e);
         } catch (IOException e) {
