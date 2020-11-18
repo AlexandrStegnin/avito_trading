@@ -120,10 +120,10 @@ public class AvitoTradingGrabberService implements Grabber {
         Document document;
         try {
             document = getDocument(url);
-            Elements aSnippetLinks = document.select("a.snippet-link");
+            Elements divs = document.select("div[data-marker=item]");
+            Elements aSnippetLinks = divs.select("a[itemprop=url]");
             for (Element element : aSnippetLinks) {
-                Elements el = element.getElementsByAttributeValue("itemprop", "url");
-                String href = el.select("a[href]").attr("href");
+                String href = element.attr("href");
                 if (!href.trim().isEmpty()) {
                     links.add(href.trim());
                 }
