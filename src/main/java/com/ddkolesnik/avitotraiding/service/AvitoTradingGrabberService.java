@@ -2,6 +2,7 @@ package com.ddkolesnik.avitotraiding.service;
 
 import com.ddkolesnik.avitotraiding.model.TradingEntity;
 import com.ddkolesnik.avitotraiding.repository.Grabber;
+import com.ddkolesnik.avitotraiding.utils.City;
 import com.ddkolesnik.avitotraiding.utils.Company;
 import com.ddkolesnik.avitotraiding.utils.UrlUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +40,10 @@ public class AvitoTradingGrabberService implements Grabber {
     }
 
     @Override
-    public int parse(String company, String city) {
+    public int parse(Company company, City city) {
+        log.info(String.format("Собираем объявления [%s]::[%s]", company.getTitle(), city.getName()));
         String url = UrlUtils.getUrl(company, city);
+        log.info(String.format("По ссылке [%s]", url));
         List<String> links = new ArrayList<>();
         int totalPages = getTotalPages(url);
         String pagePart = "&p=";
@@ -51,14 +54,14 @@ public class AvitoTradingGrabberService implements Grabber {
             pageNumber++;
         }
         log.info("Итого собрано ссылок [{} шт]", links.size());
-        return getTradings(links, Company.fromSystemName(company));
+        return getTradings(links, company);
     }
 
     @Override
     public Document getDocument(String url) throws IOException {
         long timer = 6_000;
         try {
-            log.info(String.format("Засыпаем на %d секунд", (timer / 1000)));
+//            log.info(String.format("Засыпаем на %d секунд", (timer / 1000)));
             Thread.sleep(timer);
         } catch (InterruptedException e) {
             log.error("Произошла ошибка: " + e.getLocalizedMessage());
@@ -126,7 +129,7 @@ public class AvitoTradingGrabberService implements Grabber {
         Document document;
         try {
             document = getDocument(url);
-            Elements divs = document.select("div[data-marker=item]");
+            Elements divs = document.select("[data-marker=item]");
             Elements aSnippetLinks = divs.select("a[itemprop=url]");
             for (Element element : aSnippetLinks) {
                 String href = element.attr("href");

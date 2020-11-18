@@ -1,5 +1,7 @@
 package com.ddkolesnik.avitotraiding.repository;
 
+import com.ddkolesnik.avitotraiding.utils.City;
+import com.ddkolesnik.avitotraiding.utils.Company;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
@@ -14,6 +16,6 @@ public interface Grabber {
 
     int getTotalPages(String url);
 
-    int parse(String company, String city);
+    int parse(Company company, City city);
 
 }

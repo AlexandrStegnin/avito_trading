@@ -34,12 +34,12 @@ public class ScheduledTask {
     }
 
     private int parse() {
-        int count = tradingGrabberService.parse(Company.SBER.getSystemName(), City.TYUMEN.getName());
-        count += tradingGrabberService.parse(Company.SBER.getSystemName(), City.EKB.getName());
-        count += tradingGrabberService.parse(Company.OPENING.getSystemName(), City.TYUMEN.getName());
-        count += tradingGrabberService.parse(Company.OPENING.getSystemName(), City.EKB.getName());
-        count += tradingGrabberService.parse(Company.RT.getSystemName(), City.TYUMEN.getName());
-        count += tradingGrabberService.parse(Company.RT.getSystemName(), City.EKB.getName());
+        int count = tradingGrabberService.parse(Company.SBER, City.TYUMEN);
+        count += tradingGrabberService.parse(Company.SBER, City.EKB);
+        count += tradingGrabberService.parse(Company.OPENING, City.TYUMEN);
+        count += tradingGrabberService.parse(Company.OPENING, City.EKB);
+        count += tradingGrabberService.parse(Company.RT, City.TYUMEN);
+        count += tradingGrabberService.parse(Company.RT, City.EKB);
         return count;
     }
 
