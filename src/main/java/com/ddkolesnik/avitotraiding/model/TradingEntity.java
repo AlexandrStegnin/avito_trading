@@ -90,4 +90,7 @@ public class TradingEntity extends AbstractEntity {
     @Column(name = "seller")
     private String seller;
 
+    @Column(name = "city")
+    private String city;
+
 }
