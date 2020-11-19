@@ -5,8 +5,9 @@ import com.ddkolesnik.avitotraiding.repository.Grabber;
 import com.ddkolesnik.avitotraiding.utils.City;
 import com.ddkolesnik.avitotraiding.utils.Company;
 import com.ddkolesnik.avitotraiding.utils.UrlUtils;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -31,11 +31,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class AvitoTradingGrabberService implements Grabber {
 
+    private final WebClient webClient;
+
     private final TradingService tradingService;
 
     private final Map<String, String> cookieMap = new HashMap<>();
 
-    public AvitoTradingGrabberService(TradingService tradingService) {
+    public AvitoTradingGrabberService(WebClient webClient, TradingService tradingService) {
+        this.webClient = webClient;
         this.tradingService = tradingService;
     }
 
@@ -61,25 +64,13 @@ public class AvitoTradingGrabberService implements Grabber {
     public Document getDocument(String url) throws IOException {
         long timer = 6_000;
         try {
-//            log.info(String.format("Засыпаем на %d секунд", (timer / 1000)));
             Thread.sleep(timer);
         } catch (InterruptedException e) {
             log.error("Произошла ошибка: " + e.getLocalizedMessage());
         }
-        int number = ThreadLocalRandom.current().nextInt(0, 1);
-        Connection.Response response = Jsoup.connect(url)
-                .userAgent(switchUserAgent(number))
-                .referrer(url)
-                .cookies(cookieMap)
-                .method(Connection.Method.GET)
-                .execute();
-
-        cookieMap.clear();
-        cookieMap.putAll(response.cookies());
-
-        return response.parse();
+        HtmlPage page = webClient.getPage(url);
+        return Jsoup.parse(page.asXml());
     }
-
 
     /**
      * Получить кол-во страниц
