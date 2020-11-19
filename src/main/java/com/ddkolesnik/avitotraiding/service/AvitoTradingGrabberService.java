@@ -57,7 +57,7 @@ public class AvitoTradingGrabberService implements Grabber {
             pageNumber++;
         }
         log.info("Итого собрано ссылок [{} шт]", links.size());
-        return getTradings(links, company);
+        return getTradings(links, company, city);
     }
 
     @Override
@@ -168,11 +168,11 @@ public class AvitoTradingGrabberService implements Grabber {
 
     /**
      * Получить информацию об объявлении со страницы
-     *
-     * @param url ссылка на страницу с объявлением
+     *  @param url ссылка на страницу с объявлением
      * @param company компания продавец
+     * @param city
      */
-    public void parseTrading(String url, Company company) {
+    public void parseTrading(String url, Company company, City city) {
         url = "https://www.avito.ru" + url;
         String link = url;
         TradingEntity tradingEntity;
@@ -190,6 +190,7 @@ public class AvitoTradingGrabberService implements Grabber {
             tradingEntity.setAddress(address);
             tradingEntity.setDescription(getDescription(document));
             tradingEntity.setSeller(company.getTitle());
+            tradingEntity.setCity(city.getName());
             tradingService.create(tradingEntity);
         } catch (HttpStatusException e) {
             waiting(e);
@@ -261,16 +262,16 @@ public class AvitoTradingGrabberService implements Grabber {
 
     /**
      * Получить список объявлений из массива ссылок
-     *
-     * @param urls ссылки на объявления
+     *  @param urls ссылки на объявления
      * @param company компания продавец
+     * @param city
      */
-    public int getTradings(List<String> urls, Company company) {
+    public int getTradings(List<String> urls, Company company, City city) {
         int linksCount = urls.size();
         AtomicInteger counter = new AtomicInteger(0);
         urls.forEach(url -> {
             log.info("Собираем {} из {} объявлений", counter.get() + 1, linksCount);
-            parseTrading(url, company);
+            parseTrading(url, company, city);
             counter.getAndIncrement();
         });
         return linksCount;
