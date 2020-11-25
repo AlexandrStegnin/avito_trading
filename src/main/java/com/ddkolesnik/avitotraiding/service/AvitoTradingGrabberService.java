@@ -7,6 +7,7 @@ import com.ddkolesnik.avitotraiding.utils.Company;
 import com.ddkolesnik.avitotraiding.utils.UrlUtils;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.javascript.background.JavaScriptJobManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -15,7 +16,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,15 +61,33 @@ public class AvitoTradingGrabberService implements Grabber {
     }
 
     @Override
-    public Document getDocument(String url) throws IOException {
+    public Document getDocument(String url) {
         long timer = 6_000;
         try {
             Thread.sleep(timer);
         } catch (InterruptedException e) {
             log.error("Произошла ошибка: " + e.getLocalizedMessage());
         }
-        HtmlPage page = webClient.getPage(url);
-        return Jsoup.parse(page.asXml());
+        HtmlPage page = null;
+        try {
+            page = webClient.getPage(url);
+        }  catch (HttpStatusException e) {
+            waiting(e);
+        } catch (Exception e) {
+            log.error("Произошла ошибка: " + e.getLocalizedMessage());
+        }
+        if (page != null) {
+            JavaScriptJobManager manager = page.getEnclosingWindow().getJobManager();
+            while (manager.getJobCount() > 0) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    log.error("Произошла ошибка: " + e.getLocalizedMessage());
+                }
+            }
+            return Jsoup.parse(page.asXml());
+        }
+        return null;
     }
 
     /**
@@ -118,21 +136,14 @@ public class AvitoTradingGrabberService implements Grabber {
     public List<String> getLinks(String url) {
         List<String> links = new ArrayList<>();
         Document document;
-        try {
-            document = getDocument(url);
-            Elements divs = document.select("[data-marker=item]");
-            Elements aSnippetLinks = divs.select("a[itemprop=url]");
-            for (Element element : aSnippetLinks) {
-                String href = element.attr("href");
-                if (!href.trim().isEmpty()) {
-                    links.add(href.trim());
-                }
+        document = getDocument(url);
+        Elements divs = document.select("[data-marker=item]");
+        Elements aSnippetLinks = divs.select("a[itemprop=url]");
+        for (Element element : aSnippetLinks) {
+            String href = element.attr("href");
+            if (!href.trim().isEmpty()) {
+                links.add(href.trim());
             }
-        } catch (HttpStatusException e) {
-            waiting(e);
-        } catch (IOException e) {
-            log.error(String.format("Произошла ошибка: [%s]", e));
-            return links;
         }
         return links;
     }
@@ -176,27 +187,21 @@ public class AvitoTradingGrabberService implements Grabber {
         url = "https://www.avito.ru" + url;
         String link = url;
         TradingEntity tradingEntity;
-        try {
-            Document document = getDocument(url);
-            String address = getAddress(document);
-            String title = getTitle(document);
-            if (title == null) {
-                return;
-            }
-            tradingEntity = new TradingEntity();
-            tradingEntity.setLot(title);
-            tradingEntity.setUrl(link);
-            tradingEntity.setPrice(getPrice(document));
-            tradingEntity.setAddress(address);
-            tradingEntity.setDescription(getDescription(document));
-            tradingEntity.setSeller(company.getTitle());
-            tradingEntity.setCity(city.getName());
-            tradingService.create(tradingEntity);
-        } catch (HttpStatusException e) {
-            waiting(e);
-        } catch (IOException e) {
-            log.error(String.format("Произошла ошибка: [%s]", e));
+        Document document = getDocument(url);
+        String address = getAddress(document);
+        String title = getTitle(document);
+        if (title == null) {
+            return;
         }
+        tradingEntity = new TradingEntity();
+        tradingEntity.setLot(title);
+        tradingEntity.setUrl(link);
+        tradingEntity.setPrice(getPrice(document));
+        tradingEntity.setAddress(address);
+        tradingEntity.setDescription(getDescription(document));
+        tradingEntity.setSeller(company.getTitle());
+        tradingEntity.setCity(city.getName());
+        tradingService.create(tradingEntity);
     }
 
     /**
@@ -264,7 +269,7 @@ public class AvitoTradingGrabberService implements Grabber {
      * Получить список объявлений из массива ссылок
      *  @param urls ссылки на объявления
      * @param company компания продавец
-     * @param city
+     * @param city город
      */
     public int getTradings(List<String> urls, Company company, City city) {
         int linksCount = urls.size();
@@ -275,6 +280,32 @@ public class AvitoTradingGrabberService implements Grabber {
             counter.getAndIncrement();
         });
         return linksCount;
+    }
+
+    /**
+     * Получаем площадь объявления
+     *
+     * @param document HTML страница
+     * @return площадь объявления
+     */
+    private String getArea(Document document) {
+        String area = null;
+        Elements areaEl = document.select("div.item-params");
+        if (areaEl != null) {
+            Elements areas = areaEl.select("span");
+            if (areas.size() == 6) {
+                area = areaEl.select("li").text().split(":")[1].replaceAll("[^\\d.]", "");
+            } else {
+                Element areaFirstEl = areaEl.select("span").first();
+                if (areaFirstEl != null) {
+                    String[] areaParts = areaFirstEl.text().split(":");
+                    if (areaParts.length > 1) {
+                        area = areaParts[1].replaceAll("[^\\d.]", "");
+                    }
+                }
+            }
+        }
+        return area;
     }
 
 }
