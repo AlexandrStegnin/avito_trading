@@ -90,7 +90,16 @@ public class TradingEntity extends AbstractEntity {
     @Column(name = "seller")
     private String seller;
 
+    /**
+     * Город
+     */
     @Column(name = "city")
     private String city;
+
+    /**
+     * Площадь
+     */
+    @Column(name = "area")
+    private String area;
 
 }
