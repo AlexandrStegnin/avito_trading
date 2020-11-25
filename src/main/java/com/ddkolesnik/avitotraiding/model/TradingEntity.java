@@ -102,4 +102,9 @@ public class TradingEntity extends AbstractEntity {
     @Column(name = "area")
     private String area;
 
+    /**
+     * Источник
+     */
+    @Column(name = "lot_source")
+    private String lotSource;
 }
