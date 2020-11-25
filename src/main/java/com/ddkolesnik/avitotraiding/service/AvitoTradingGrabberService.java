@@ -5,8 +5,9 @@ import com.ddkolesnik.avitotraiding.repository.Grabber;
 import com.ddkolesnik.avitotraiding.utils.City;
 import com.ddkolesnik.avitotraiding.utils.Company;
 import com.ddkolesnik.avitotraiding.utils.UrlUtils;
-import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
+import com.gargoylesoftware.htmlunit.AjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
@@ -68,18 +69,21 @@ public class AvitoTradingGrabberService implements Grabber {
         } catch (InterruptedException e) {
             log.error("Произошла ошибка: " + e.getLocalizedMessage());
         }
-        HtmlPage page = null;
+        HtmlPage page;
         try {
-            webClient.setAjaxController(new NicelyResynchronizingAjaxController());
+            webClient.setAjaxController(new AjaxController(){
+                @Override
+                public boolean processSynchron(HtmlPage page, WebRequest request, boolean async) {
+                    return true;
+                }
+            });
             page = webClient.getPage(url);
+            webClient.waitForBackgroundJavaScript(10 * 1000);
+            return Jsoup.parse(page.asXml());
         }  catch (HttpStatusException e) {
             waiting(e);
         } catch (Exception e) {
             log.error("Произошла ошибка: " + e.getLocalizedMessage());
-        }
-        if (page != null) {
-            webClient.waitForBackgroundJavaScript(timer);
-            return Jsoup.parse(page.asXml());
         }
         return null;
     }
