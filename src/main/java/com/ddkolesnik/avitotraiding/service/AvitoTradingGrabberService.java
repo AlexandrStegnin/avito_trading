@@ -5,9 +5,9 @@ import com.ddkolesnik.avitotraiding.repository.Grabber;
 import com.ddkolesnik.avitotraiding.utils.City;
 import com.ddkolesnik.avitotraiding.utils.Company;
 import com.ddkolesnik.avitotraiding.utils.UrlUtils;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.javascript.background.JavaScriptJobManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -70,6 +70,7 @@ public class AvitoTradingGrabberService implements Grabber {
         }
         HtmlPage page = null;
         try {
+            webClient.setAjaxController(new NicelyResynchronizingAjaxController());
             page = webClient.getPage(url);
         }  catch (HttpStatusException e) {
             waiting(e);
@@ -77,14 +78,7 @@ public class AvitoTradingGrabberService implements Grabber {
             log.error("Произошла ошибка: " + e.getLocalizedMessage());
         }
         if (page != null) {
-            JavaScriptJobManager manager = page.getEnclosingWindow().getJobManager();
-            while (manager.getJobCount() > 0) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    log.error("Произошла ошибка: " + e.getLocalizedMessage());
-                }
-            }
+            webClient.waitForBackgroundJavaScript(timer);
             return Jsoup.parse(page.asXml());
         }
         return null;
@@ -184,7 +178,7 @@ public class AvitoTradingGrabberService implements Grabber {
      * @param city
      */
     public void parseTrading(String url, Company company, City city) {
-        url = "https://www.avito.ru" + url;
+        url = "https://avito.ru" + url;
         String link = url;
         TradingEntity tradingEntity;
         Document document = getDocument(url);
@@ -201,6 +195,8 @@ public class AvitoTradingGrabberService implements Grabber {
         tradingEntity.setDescription(getDescription(document));
         tradingEntity.setSeller(company.getTitle());
         tradingEntity.setCity(city.getName());
+        tradingEntity.setArea(getArea(document));
+        tradingEntity.setLotSource("Авито");
         tradingService.create(tradingEntity);
     }
 
