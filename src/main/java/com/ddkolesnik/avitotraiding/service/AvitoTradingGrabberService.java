@@ -181,7 +181,7 @@ public class AvitoTradingGrabberService implements Grabber {
      * Получить информацию об объявлении со страницы
      *  @param url ссылка на страницу с объявлением
      * @param company компания продавец
-     * @param city
+     * @param city город
      */
     public void parseTrading(String url, Company company, City city) {
         url = "https://avito.ru" + url;
@@ -189,6 +189,9 @@ public class AvitoTradingGrabberService implements Grabber {
         TradingEntity tradingEntity;
         Document document = getDocument(url);
         String address = getAddress(document);
+        if (!checkAddress(address, city)) {
+            return;
+        }
         String title = getTitle(document);
         if (title == null) {
             return;
