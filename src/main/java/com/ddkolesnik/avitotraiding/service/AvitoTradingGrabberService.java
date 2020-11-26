@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Alexandr Stegnin
@@ -306,6 +308,52 @@ public class AvitoTradingGrabberService implements Grabber {
             }
         }
         return area;
+    }
+
+    /**
+     * Проверить адрес, должен содержать в себе Московская область, г Москва/Свердловская обл, г Екатеринбург/Тюменская обл, г Тюмень
+     *
+     * @param address адресс для проверки
+     * @param city    город для получения регулярного выражения
+     * @return результат проверки
+     */
+    private boolean checkAddress(String address, City city) {
+        if (address == null) {
+            return true;
+        }
+        if (checkArea(address, city)) {
+            return checkCity(address, city);
+        }
+        return true;
+    }
+
+    /**
+     * Проверить область по шаблону
+     *
+     * @param address адрес
+     * @param city    город
+     * @return результат
+     */
+    private boolean checkArea(String address, City city) {
+        Pattern pattern = Pattern.compile(city.getPattern());
+        Matcher matcher = pattern.matcher(address.toLowerCase());
+        return matcher.find();
+    }
+
+    /**
+     * Проверить город по шаблону
+     *
+     * @param address адрес
+     * @param city    город
+     * @return результат
+     */
+    private boolean checkCity(String address, City city) {
+        String cityName = city.getName().toLowerCase();
+        String template = "(%s)";
+        String cityPattern = String.format(template, cityName);
+        Pattern pattern = Pattern.compile(cityPattern);
+        Matcher matcher = pattern.matcher(address.toLowerCase());
+        return matcher.find();
     }
 
 }
