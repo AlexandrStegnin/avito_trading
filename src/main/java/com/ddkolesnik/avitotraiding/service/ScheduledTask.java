@@ -28,7 +28,7 @@ public class ScheduledTask {
      */
     @Scheduled(cron = "${cron.expression.daily}")
     public void runDaily() {
-        log.info("Начинаем ЕЖЕДНЕВНЫЙ сбор объявлений");
+        log.info("Начинаем сбор объявлений");
         int count = parse();
         log.info("Завершено, собрано объявлений [{} шт]", count);
     }
