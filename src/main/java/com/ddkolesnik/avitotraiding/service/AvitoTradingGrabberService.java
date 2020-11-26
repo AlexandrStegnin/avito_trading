@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexandr Stegnin
@@ -59,6 +60,7 @@ public class AvitoTradingGrabberService implements Grabber {
             links.addAll(getLinks(url.concat(pagePart).concat(String.valueOf(pageNumber))));
             pageNumber++;
         }
+        links = links.stream().distinct().collect(Collectors.toList());
         log.info("Итого собрано ссылок [{} шт]", links.size());
         return getTradings(links, company, city);
     }
@@ -142,7 +144,7 @@ public class AvitoTradingGrabberService implements Grabber {
         for (Element element : aSnippetLinks) {
             String href = element.attr("href");
             if (!href.trim().isEmpty()) {
-                links.add(href.trim());
+                links.add(href.trim().replace("?src=bp_catalog", ""));
             }
         }
         return links;
@@ -327,7 +329,7 @@ public class AvitoTradingGrabberService implements Grabber {
         if (checkArea(address, city)) {
             return checkCity(address, city);
         }
-        return true;
+        return false;
     }
 
     /**
