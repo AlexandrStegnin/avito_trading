@@ -16,7 +16,7 @@ public class AppConfig {
 
     @Bean
     public WebClient webClient() {
-        WebClient webClient = new WebClient(BrowserVersion.FIREFOX_78);
+        WebClient webClient = new WebClient(BrowserVersion.CHROME);
         webClient.setCssErrorHandler(new SilentCssErrorHandler());
         configureOptions(webClient);
         return webClient;
