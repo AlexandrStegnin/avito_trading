@@ -78,10 +78,19 @@ public class AvitoTradingGrabberService implements Grabber {
             webClient.setAjaxController(new AjaxController(){
                 @Override
                 public boolean processSynchron(HtmlPage page, WebRequest request, boolean async) {
-                    return true;
+                    return false;
                 }
             });
             page = webClient.getPage(url);
+            for (int i = 0; i < 20; i++) {
+                if (page.asXml().contains("data-marker=\"item\"")) {
+                    break;
+                }
+                synchronized (page) {
+                    page.wait(500);
+                }
+            }
+
             webClient.waitForBackgroundJavaScript(10 * 1000);
             return Jsoup.parse(page.asXml());
         }  catch (HttpStatusException e) {
