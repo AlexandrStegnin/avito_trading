@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,8 +36,6 @@ public class AvitoTradingGrabberService implements Grabber {
     private final WebClient webClient;
 
     private final TradingService tradingService;
-
-    private final Map<String, String> cookieMap = new HashMap<>();
 
     public AvitoTradingGrabberService(WebClient webClient, TradingService tradingService) {
         this.webClient = webClient;
