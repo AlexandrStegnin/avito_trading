@@ -296,11 +296,10 @@ public class RadGrabberService implements Grabber {
         Element product = getElement(document, "div.product");
         List<Element> paragraphs = product.select("p");
         StringBuilder address = new StringBuilder();
-        int counter = 0;
         for (Element p : paragraphs) {
-            counter++;
-            if (counter == 4) {
-                address.append(p.text());
+            Element aHref = p.selectFirst("a[id=formMain:openAddrCardPreviewId]");
+            if (aHref != null) {
+                address.append(aHref.text());
             }
         }
         return address.toString().trim();
