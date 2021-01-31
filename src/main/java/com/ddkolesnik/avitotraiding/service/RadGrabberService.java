@@ -360,8 +360,8 @@ public class RadGrabberService implements Grabber {
         Element step = tender.selectFirst("div[id=formMain:opStepValue]");
         if (step != null) {
             List<Element> paragraphs = step.select("span.gray1");
-            if (paragraphs.size() >0) {
-                auctionStep = paragraphs.get(0).text().replaceAll("\\D", "");
+            if (paragraphs.size() > 0) {
+                auctionStep = paragraphs.get(0).text().replaceAll("\\s", "");
             }
         }
         return auctionStep;
