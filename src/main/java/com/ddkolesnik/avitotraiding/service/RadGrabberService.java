@@ -28,8 +28,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.codeborne.selenide.Selectors.withText;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.*;
 
 /**
  * @author Alexandr Stegnin
@@ -108,6 +107,7 @@ public class RadGrabberService implements Grabber {
      */
     private Map<String, String> getLinks(City city) {
         Map<String, String> links = new HashMap<>();
+        open("https://sales.lot-online.ru/e-auction/lots.xhtml");
         filterPage(city);
         while (true) {
             links.putAll(prepareLinks());
@@ -123,6 +123,7 @@ public class RadGrabberService implements Grabber {
                 break;
             }
         }
+        closeWebDriver();
         return links;
     }
 
@@ -132,7 +133,6 @@ public class RadGrabberService implements Grabber {
      * @param city город
      */
     private void filterPage(City city) {
-        open("https://sales.lot-online.ru/e-auction/lots.xhtml");
         WebDriverRunner.getWebDriver().manage().window().fullscreen();
         WebDriverRunner.getWebDriver().manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
         // Раскрываем форму поиска
@@ -248,6 +248,7 @@ public class RadGrabberService implements Grabber {
         tradingEntity.setAcceptRequestsDate(getAcceptRequestsDate(document));
         tradingEntity.setLotSource("Российский Аукционный Дом");
         tradingEntity.setCity(city.getName());
+        log.info("Сохраняем инфо об аукционе: {}", tradingEntity);
         return tradingService.create(tradingEntity);
     }
 
