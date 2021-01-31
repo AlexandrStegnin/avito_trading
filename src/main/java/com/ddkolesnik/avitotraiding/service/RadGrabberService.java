@@ -16,6 +16,7 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.openqa.selenium.By;
 import org.springframework.stereotype.Service;
 
@@ -249,6 +250,7 @@ public class RadGrabberService implements Grabber {
         tradingEntity.setAcceptRequestsDate(getAcceptRequestsDate(document));
         tradingEntity.setLotSource("Российский Аукционный Дом");
         tradingEntity.setCity(city.getName());
+        tradingEntity.setPrice(getPrice(document));
         log.info("Сохраняем инфо об аукционе: {}", tradingEntity);
         return tradingService.create(tradingEntity);
     }
@@ -444,6 +446,30 @@ public class RadGrabberService implements Grabber {
                 log.error(String.format("Произошла ошибка: [%s]", exception));
             }
         }
+    }
+
+    /**
+     * Получить стоимость лота
+     *
+     * @param document документ-страница
+     * @return стоимость лота
+     */
+    private BigDecimal getPrice(Document document) {
+        BigDecimal price = BigDecimal.ZERO;
+        Element priceDiv = document.selectFirst("div[id=formMain:opCostBValue]");
+        if (priceDiv != null) {
+            Element priceSpan = priceDiv.selectFirst("span.price");
+            if (priceSpan != null) {
+                List<Node> child = priceSpan.childNodes();
+                if (child.size() > 0) {
+                    String priceStr = child.get(0).toString();
+                    try {
+                        price = new BigDecimal(priceStr.replaceAll("&nbsp;", "").trim());
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        }
+        return price;
     }
 
 }
