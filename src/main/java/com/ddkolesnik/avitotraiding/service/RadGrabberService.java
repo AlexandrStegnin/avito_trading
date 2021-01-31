@@ -19,6 +19,7 @@ import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -374,13 +375,16 @@ public class RadGrabberService implements Grabber {
         String depositAmount = "";
         Element tender = getElement(document, "div.tender");
         List<Element> spans = tender.select("span.gray1");
-        int counter = 0;
-        for (Element span : spans) {
-            counter++;
-            if (counter == 6) {
-                depositAmount = span.text().replaceAll("\\s", "");
-            }
+        String tmp;
+        if (spans.size() == 11) {
+            tmp = spans.get(8).text().replaceAll("\\s", "");
+        } else {
+            tmp = spans.get(5).text().replaceAll("\\s", "");
         }
+        try {
+            new BigDecimal(tmp);
+            depositAmount = tmp;
+        } catch (NumberFormatException ignored) {}
         return depositAmount;
     }
 
