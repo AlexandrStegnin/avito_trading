@@ -396,11 +396,16 @@ public class RadGrabberService implements Grabber {
      * @return время проведения аукциона
      */
     private String getTradingTime(Document document) {
-        String tradingTime;
+        String tradingTime = "";
         Element tender = getElement(document, "div.tender");
         Element paragraph = tender.selectFirst("p");
         Element em = paragraph.selectFirst("em");
-        tradingTime = em.text().substring(0, 18);
+        String tmp = em.text().replaceAll("[А-Яа-я]", "").trim();
+        if (tmp.length() >= 33) {
+            tradingTime = tmp.substring(0, 33);
+        } else if (tmp.length() >= 18) {
+            tradingTime = tmp.substring(0, 18);
+        }
         return tradingTime;
     }
 
