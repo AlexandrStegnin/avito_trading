@@ -29,6 +29,7 @@ public class DaDataService {
         tradingEntity.setCleanAddress(cleanAddress.trim());
         tradingEntity.setLatitude(address.getGeoLat());
         tradingEntity.setLongitude(address.getGeoLon());
+        tradingEntity.setAddress(address.getResult());
     }
 
 }
