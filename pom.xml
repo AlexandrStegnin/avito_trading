@@ -74,6 +74,13 @@
             <version>5.18.0</version>
         </dependency>
 
+        <!-- Для очистки адресов -->
+        <dependency>
+            <groupId>ru.redcom.lib</groupId>
+            <artifactId>dadata-api-client</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
