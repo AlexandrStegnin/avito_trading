@@ -118,12 +118,12 @@ public class TradingEntity extends AbstractEntity {
      * Широта
      */
     @Column(name = "latitude")
-    private String latitude;
+    private Double latitude;
 
     /**
      * Долгота
      */
     @Column(name = "longitude")
-    private String longitude;
+    private Double longitude;
 
 }
