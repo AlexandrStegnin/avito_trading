@@ -4,8 +4,11 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebClientOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.redcom.lib.integration.api.client.dadata.DaDataClient;
+import ru.redcom.lib.integration.api.client.dadata.DaDataClientFactory;
 
 /**
  * @author Alexandr Stegnin
@@ -13,6 +16,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
+
+    @Value("${dadata.api.key}")
+    private String apiKey;
+
+    @Value("${dadata.secret}")
+    private String secret;
 
     @Bean
     public WebClient webClient() {
@@ -30,6 +39,11 @@ public class AppConfig {
         options.setThrowExceptionOnScriptError(false);
         options.setPrintContentOnFailingStatusCode(false);
         options.setThrowExceptionOnFailingStatusCode(false);
+    }
+
+    @Bean
+    public DaDataClient daDataClient() {
+        return DaDataClientFactory.getInstance(apiKey, secret);
     }
 
 }
