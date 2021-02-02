@@ -37,9 +37,13 @@ public class AvitoTradingGrabberService implements Grabber {
 
     private final TradingService tradingService;
 
-    public AvitoTradingGrabberService(WebClient webClient, TradingService tradingService) {
+    private final DaDataService daDataService;
+
+    public AvitoTradingGrabberService(WebClient webClient, TradingService tradingService,
+                                      DaDataService daDataService) {
         this.webClient = webClient;
         this.tradingService = tradingService;
+        this.daDataService = daDataService;
     }
 
     @Override
@@ -213,6 +217,7 @@ public class AvitoTradingGrabberService implements Grabber {
         tradingEntity.setCity(city.getName());
         tradingEntity.setArea(getArea(document));
         tradingEntity.setLotSource("Авито");
+        daDataService.cleanData(tradingEntity);
         tradingService.create(tradingEntity);
     }
 
