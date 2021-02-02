@@ -19,8 +19,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.openqa.selenium.By;
 import org.springframework.stereotype.Service;
-import ru.redcom.lib.integration.api.client.dadata.DaDataClient;
-import ru.redcom.lib.integration.api.client.dadata.dto.Address;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -46,13 +44,13 @@ public class RadGrabberService implements Grabber {
 
     private final TradingService tradingService;
 
-    private final DaDataClient daDataClient;
+    private final DaDataService daDataService;
 
     public RadGrabberService(WebClient webClient, TradingService tradingService,
-                             DaDataClient daDataClient) {
+                             DaDataService daDataService) {
         this.webClient = webClient;
         this.tradingService = tradingService;
-        this.daDataClient = daDataClient;
+        this.daDataService = daDataService;
     }
 
     @Override
@@ -254,25 +252,12 @@ public class RadGrabberService implements Grabber {
         tradingEntity.setDepositAmount(getDepositAmount(document));
         tradingEntity.setTradingTime(getTradingTime(document));
         tradingEntity.setAcceptRequestsDate(getAcceptRequestsDate(document));
-        tradingEntity.setLotSource("Российский Аукционный Дом");
+        tradingEntity.setLotSource("РАД");
         tradingEntity.setCity(city.getName());
         tradingEntity.setPrice(getPrice(document));
-        cleanAddress(tradingEntity);
+        daDataService.cleanData(tradingEntity);
         log.info("Сохраняем инфо об аукционе: {}", tradingEntity);
         return tradingService.create(tradingEntity);
-    }
-
-    private void cleanAddress(TradingEntity tradingEntity) {
-        Address address = daDataClient.cleanAddress(tradingEntity.getAddress());
-        String streetWithType = address.getStreetWithType() == null ? "" : address.getStreetWithType();
-        String houseType = address.getHouseType() == null ? "" : address.getHouseType();
-        String house = address.getHouse() == null ? "" : address.getHouse();
-        String blockType = address.getBlockType() == null ? "" : address.getBlockType();
-        String block = address.getBlock() == null ? "" : address.getBlock();
-        String cleanAddress = streetWithType + " " + houseType + " " + house + " " + blockType + " " + block;
-        tradingEntity.setCleanAddress(cleanAddress.trim());
-        tradingEntity.setLatitude(address.getGeoLat());
-        tradingEntity.setLongitude(address.getGeoLon());
     }
 
     /**
