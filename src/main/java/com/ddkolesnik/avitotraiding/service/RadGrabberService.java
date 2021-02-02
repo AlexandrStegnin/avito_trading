@@ -466,9 +466,12 @@ public class RadGrabberService implements Grabber {
             if (priceSpan != null) {
                 List<Node> child = priceSpan.childNodes();
                 if (child.size() > 0) {
-                    String priceStr = child.get(0).toString();
+                    String priceStr = child.get(0).toString()
+                            .replaceAll("&nbsp;", "")
+                            .replace(",", ".")
+                            .trim();
                     try {
-                        price = new BigDecimal(priceStr.replaceAll("&nbsp;", "").trim());
+                        price = new BigDecimal(priceStr);
                     } catch (NumberFormatException ignored) {}
                 }
             }
