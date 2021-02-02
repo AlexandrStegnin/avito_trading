@@ -107,4 +107,23 @@ public class TradingEntity extends AbstractEntity {
      */
     @Column(name = "lot_source")
     private String lotSource;
+
+    /**
+     * Очищенный адрес
+     */
+    @Column(name = "clean_address")
+    private String cleanAddress;
+
+    /**
+     * Широта
+     */
+    @Column(name = "latitude")
+    private String latitude;
+
+    /**
+     * Долгота
+     */
+    @Column(name = "longitude")
+    private String longitude;
+
 }
