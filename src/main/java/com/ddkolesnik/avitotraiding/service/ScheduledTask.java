@@ -16,8 +16,12 @@ public class ScheduledTask {
 
     private final AvitoTradingGrabberService tradingGrabberService;
 
-    public ScheduledTask(AvitoTradingGrabberService tradingGrabberService) {
+    private final RadGrabberService radGrabberService;
+
+    public ScheduledTask(AvitoTradingGrabberService tradingGrabberService,
+                         RadGrabberService radGrabberService) {
         this.tradingGrabberService = tradingGrabberService;
+        this.radGrabberService = radGrabberService;
     }
 
     /*
@@ -30,6 +34,7 @@ public class ScheduledTask {
     public void runDaily() {
         log.info("Начинаем сбор объявлений");
         int count = parse();
+        count += parseRad();
         log.info("Завершено, собрано объявлений [{} шт]", count);
     }
 
@@ -40,6 +45,12 @@ public class ScheduledTask {
         count += tradingGrabberService.parse(Company.OPENING, City.EKB);
         count += tradingGrabberService.parse(Company.RT, City.TYUMEN);
         count += tradingGrabberService.parse(Company.RT, City.EKB);
+        return count;
+    }
+
+    private int parseRad() {
+        int count = radGrabberService.parse(null, City.TYUMEN);
+        count += radGrabberService.parse(null, City.EKB);
         return count;
     }
 
