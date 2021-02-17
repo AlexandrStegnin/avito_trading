@@ -241,6 +241,9 @@ public class RadGrabberService implements Grabber {
      */
     private TradingEntity getAuctionInfo(String lot, String url, City city) {
         Document document = getDocument(url);
+        if (!isProperty(document)) {
+            return null;
+        }
         TradingEntity tradingEntity = new TradingEntity();
         tradingEntity.setLot(lot);
         tradingEntity.setUrl(url);
@@ -482,6 +485,27 @@ public class RadGrabberService implements Grabber {
             }
         }
         return price;
+    }
+
+    /**
+     * Отсеиваем всё, что не относится к "Недвижимое имущество > Коммерческая недвижимость >"
+     *
+     * @param document HTML страница
+     * @return ответ
+     */
+    private boolean isProperty(Document document) {
+        Element product = getElement(document, "div.product");
+        List<Element> paragraphs = product.select("p");
+        String description;
+        int counter = 0;
+        for (Element p : paragraphs) {
+            counter ++;
+            if (counter == 2) {
+                description = p.text();
+                return description.startsWith("Недвижимое имущество > Коммерческая недвижимость >");
+            }
+        }
+        return true;
     }
 
 }
