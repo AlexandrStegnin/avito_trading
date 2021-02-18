@@ -18,24 +18,26 @@ public class ScheduledTask {
 
     private final RadGrabberService radGrabberService;
 
+    private final RtsGrabberService rtsGrabberService;
+
     public ScheduledTask(AvitoTradingGrabberService tradingGrabberService,
-                         RadGrabberService radGrabberService) {
+                         RadGrabberService radGrabberService,
+                         RtsGrabberService rtsGrabberService) {
         this.tradingGrabberService = tradingGrabberService;
         this.radGrabberService = radGrabberService;
+        this.rtsGrabberService = rtsGrabberService;
     }
 
-    /*
-    Для ежедневного запуска:
-    1. Получаем максимальную дату публикации из базы данных
-    2. Проверяем первые 3 страницы объявлений
-    3. Собираем новые объявления
-     */
     @Scheduled(cron = "${cron.expression.daily}")
     public void runDaily() {
         log.info("Начинаем сбор объявлений");
         int count = parse();
-        count += parseRad();
-        log.info("Завершено, собрано объявлений [{} шт]", count);
+        log.info("Собрано лотов АВИТО: {}", count);
+        int countRad = parseRad();
+        log.info("Собрано лотов РАД: {}", countRad);
+        int countRts = parseRts();
+        log.info("Собрано лотов РТС: {}", countRts);
+        log.info("Завершено, собрано объявлений [{} шт]", count + countRad + countRts);
     }
 
     private int parse() {
@@ -52,6 +54,10 @@ public class ScheduledTask {
         int count = radGrabberService.parse(null, City.TYUMEN);
         count += radGrabberService.parse(null, City.EKB);
         return count;
+    }
+
+    private int parseRts() {
+        return rtsGrabberService.parse();
     }
 
 }
