@@ -57,7 +57,9 @@ public class ScheduledTask {
     }
 
     private int parseRts() {
-        return rtsGrabberService.parse();
+        int count = rtsGrabberService.parse(City.TYUMEN);
+        count += rtsGrabberService.parse(City.EKB);
+        return count;
     }
 
 }
