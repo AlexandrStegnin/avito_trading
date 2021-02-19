@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.codeborne.selenide.Selenide.*;
 
@@ -49,29 +51,35 @@ public class RtsGrabberService {
      */
     public int parse(City city) {
         List<TradingEntity> entities = getRtsLots(city);
-        return getRtsLotInfo(entities);
+        return getRtsLotInfo(entities, city);
     }
 
     /**
      * Дополнить информацию по каждому лоту с РТС
      *
      * @param entities лоты
+     * @param city город
      * @return кол-во собранных лотов
      */
-    private int getRtsLotInfo(List<TradingEntity> entities) {
+    private int getRtsLotInfo(List<TradingEntity> entities, City city) {
         for (TradingEntity entity : entities) {
             waitFiltered(entity.getUrl(), "openPart");
+            SelenideElement address = $(By.id("BaseMainContent_MainContent_ucTradeLotViewList_tlvLot_fvDeliveryAddress_lblValue"));
+            address.shouldBe(Condition.visible);
+            String addressText = address.text();
+            if (!checkCity(addressText, city)) {
+                continue;
+            }
             SelenideElement description = $(By.id("BaseMainContent_MainContent_ucTradeLotViewList_tlvLot_hLotTitle"));
-            description.shouldBe(Condition.appear);
+            description.shouldBe(Condition.visible);
             String descriptionText = description.text();
             String price = $(By.id("BaseMainContent_MainContent_ucTradeLotViewList_tlvLot_fvLotPrice_lblValue")).text();
-            String address = $(By.id("BaseMainContent_MainContent_ucTradeLotViewList_tlvLot_fvDeliveryAddress_lblValue")).text();
             String auctionStep = $(By.id("BaseMainContent_MainContent_ucTradeLotViewList_tlvLot_fvAuctionStep_lblValue")).text();
             String depositAmount = $(By.id("BaseMainContent_MainContent_ucTradeLotViewList_tlvLot_fvEarnestSum_lblValue")).text();
             String seller = $(By.id("BaseMainContent_MainContent_fvSeller_lblValue")).text();
             entity.setDescription(descriptionText);
             entity.setPrice(BigDecimal.valueOf(Long.parseLong(price.split(",")[0].replaceAll("\\s", ""))));
-            entity.setAddress(address);
+            entity.setAddress(addressText);
             entity.setAuctionStep(auctionStep);
             entity.setDepositAmount(depositAmount);
             entity.setSeller(seller);
@@ -138,5 +146,21 @@ public class RtsGrabberService {
         WebDriverRunner.getWebDriver().manage().timeouts().pageLoadTimeout(20, TimeUnit.SECONDS);
         SelenideElement process = $(By.className(processName));
         process.shouldBe(Condition.visible);
+    }
+
+    /**
+     * Проверить город по шаблону
+     *
+     * @param address адрес
+     * @param city    город
+     * @return результат
+     */
+    private boolean checkCity(String address, City city) {
+        String cityName = city.getName().toLowerCase();
+        String template = "(%s)";
+        String cityPattern = String.format(template, cityName);
+        Pattern pattern = Pattern.compile(cityPattern);
+        Matcher matcher = pattern.matcher(address.toLowerCase());
+        return matcher.find();
     }
 }
