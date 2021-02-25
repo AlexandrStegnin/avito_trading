@@ -75,9 +75,6 @@ public class Fund72GrabberService implements Verifiable {
                         if (fieldsContainer.exists()) {
                             int counter = 0;
                             String address = "";
-                            if (!checkCity(address, city)) {
-                                continue;
-                            }
                             StringBuilder acceptRequestsDate = new StringBuilder();
                             List<SelenideElement> fieldsEntry = fieldsContainer.$$(By.cssSelector("dd.field-entry"));
                             if (fieldsEntry.size() >= 5) {
@@ -102,6 +99,9 @@ public class Fund72GrabberService implements Verifiable {
                                     }
                                     counter++;
                                 }
+                            }
+                            if (!checkCity(address, city)) {
+                                continue;
                             }
                             String tradingTime = "";
                             String strPrice = "";
