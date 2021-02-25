@@ -20,12 +20,16 @@ public class ScheduledTask {
 
     private final RtsGrabberService rtsGrabberService;
 
+    private final Fund72GrabberService fund72GrabberService;
+
     public ScheduledTask(AvitoTradingGrabberService tradingGrabberService,
                          RadGrabberService radGrabberService,
-                         RtsGrabberService rtsGrabberService) {
+                         RtsGrabberService rtsGrabberService,
+                         Fund72GrabberService fund72GrabberService) {
         this.tradingGrabberService = tradingGrabberService;
         this.radGrabberService = radGrabberService;
         this.rtsGrabberService = rtsGrabberService;
+        this.fund72GrabberService = fund72GrabberService;
     }
 
     @Scheduled(cron = "${cron.expression.daily}")
@@ -37,7 +41,9 @@ public class ScheduledTask {
         log.info("Собрано лотов РАД: {}", countRad);
         int countRts = parseRts();
         log.info("Собрано лотов РТС: {}", countRts);
-        log.info("Завершено, собрано объявлений [{} шт]", count + countRad + countRts);
+        int countFito = parseFito();
+        log.info("Собрано лотов ФИТО: {}", countFito);
+        log.info("Завершено, собрано лотов [{} шт]", count + countRad + countRts + countFito);
     }
 
     private int parse() {
@@ -60,6 +66,10 @@ public class ScheduledTask {
         int count = rtsGrabberService.parse(City.TYUMEN);
         count += rtsGrabberService.parse(City.EKB);
         return count;
+    }
+
+    private int parseFito() {
+        return fund72GrabberService.parse(City.TYUMEN);
     }
 
 }
