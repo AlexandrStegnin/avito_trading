@@ -210,6 +210,7 @@ public class Fund72GrabberService implements Verifiable {
                 lot = headLine.text();
             }
             entity.setLot(lot);
+            log.info("Сохраняем инфо об аукционе: {}", entity);
             tradingService.create(entity);
         }
         closeWebDriver();
