@@ -2,6 +2,7 @@ package com.ddkolesnik.avitotraiding.service;
 
 import com.ddkolesnik.avitotraiding.model.TradingEntity;
 import com.ddkolesnik.avitotraiding.repository.Grabber;
+import com.ddkolesnik.avitotraiding.repository.Verifiable;
 import com.ddkolesnik.avitotraiding.utils.City;
 import com.ddkolesnik.avitotraiding.utils.Company;
 import com.ddkolesnik.avitotraiding.utils.UrlUtils;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class AvitoTradingGrabberService implements Grabber {
+public class AvitoTradingGrabberService implements Grabber, Verifiable {
 
     private final WebClient webClient;
 
@@ -351,22 +352,6 @@ public class AvitoTradingGrabberService implements Grabber {
      */
     private boolean checkArea(String address, City city) {
         Pattern pattern = Pattern.compile(city.getPattern());
-        Matcher matcher = pattern.matcher(address.toLowerCase());
-        return matcher.find();
-    }
-
-    /**
-     * Проверить город по шаблону
-     *
-     * @param address адрес
-     * @param city    город
-     * @return результат
-     */
-    private boolean checkCity(String address, City city) {
-        String cityName = city.getName().toLowerCase();
-        String template = "(%s)";
-        String cityPattern = String.format(template, cityName);
-        Pattern pattern = Pattern.compile(cityPattern);
         Matcher matcher = pattern.matcher(address.toLowerCase());
         return matcher.find();
     }

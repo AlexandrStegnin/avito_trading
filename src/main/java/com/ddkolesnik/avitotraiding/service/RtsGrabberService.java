@@ -4,6 +4,7 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.WebDriverRunner;
 import com.ddkolesnik.avitotraiding.model.TradingEntity;
+import com.ddkolesnik.avitotraiding.repository.Verifiable;
 import com.ddkolesnik.avitotraiding.utils.City;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -14,8 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.codeborne.selenide.Selenide.*;
 
@@ -27,7 +26,7 @@ import static com.codeborne.selenide.Selenide.*;
 
 @Slf4j
 @Service
-public class RtsGrabberService {
+public class RtsGrabberService implements Verifiable {
 
     private final TradingService tradingService;
 
@@ -148,19 +147,4 @@ public class RtsGrabberService {
         process.shouldBe(Condition.visible);
     }
 
-    /**
-     * Проверить город по шаблону
-     *
-     * @param address адрес
-     * @param city    город
-     * @return результат
-     */
-    private boolean checkCity(String address, City city) {
-        String cityName = city.getName().toLowerCase();
-        String template = "(%s)";
-        String cityPattern = String.format(template, cityName);
-        Pattern pattern = Pattern.compile(cityPattern);
-        Matcher matcher = pattern.matcher(address.toLowerCase());
-        return matcher.find();
-    }
 }
