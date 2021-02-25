@@ -204,6 +204,12 @@ public class Fund72GrabberService implements Verifiable {
                     }
                 }
             }
+            SelenideElement headLine = $(By.cssSelector("h2[itemprop=headline]"));
+            String lot = "";
+            if (headLine.exists()) {
+                lot = headLine.text();
+            }
+            entity.setLot(lot);
             tradingService.create(entity);
         }
         closeWebDriver();
