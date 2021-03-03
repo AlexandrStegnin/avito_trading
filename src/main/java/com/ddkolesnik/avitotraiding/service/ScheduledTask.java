@@ -1,5 +1,6 @@
 package com.ddkolesnik.avitotraiding.service;
 
+import com.codeborne.selenide.WebDriverRunner;
 import com.ddkolesnik.avitotraiding.utils.City;
 import com.ddkolesnik.avitotraiding.utils.Company;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +23,18 @@ public class ScheduledTask {
 
     private final Fund72GrabberService fund72GrabberService;
 
+    private final SberAstGrabberService sberAstGrabberService;
+
     public ScheduledTask(AvitoTradingGrabberService tradingGrabberService,
                          RadGrabberService radGrabberService,
                          RtsGrabberService rtsGrabberService,
-                         Fund72GrabberService fund72GrabberService) {
+                         Fund72GrabberService fund72GrabberService,
+                         SberAstGrabberService sberAstGrabberService) {
         this.tradingGrabberService = tradingGrabberService;
         this.radGrabberService = radGrabberService;
         this.rtsGrabberService = rtsGrabberService;
         this.fund72GrabberService = fund72GrabberService;
+        this.sberAstGrabberService = sberAstGrabberService;
     }
 
     @Scheduled(cron = "${cron.expression.daily}")
@@ -43,7 +48,9 @@ public class ScheduledTask {
         log.info("Собрано лотов РТС: {}", countRts);
         int countFito = parseFito();
         log.info("Собрано лотов ФИТО: {}", countFito);
-        log.info("Завершено, собрано лотов [{} шт]", count + countRad + countRts + countFito);
+        int countSberAst = parseSberAst();
+        log.info("Собрано лотов Сбер АСТ: {}", countSberAst);
+        log.info("Завершено, собрано лотов [{} шт]", count + countRad + countRts + countFito + countSberAst);
     }
 
     private int parse() {
@@ -72,4 +79,10 @@ public class ScheduledTask {
         return fund72GrabberService.parse(City.TYUMEN);
     }
 
+    private int parseSberAst() {
+        int count = sberAstGrabberService.parse(City.TYUMEN);
+        count += sberAstGrabberService.parse(City.EKB);
+        WebDriverRunner.closeWebDriver();
+        return count;
+    }
 }
