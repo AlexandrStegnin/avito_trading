@@ -42,7 +42,6 @@ public class SberAstGrabberService {
      */
     public int parse(City city) {
         List<TradingEntity> entities = getSberAstLots(city);
-        closeWebDriver();
         return entities.size();
     }
 
