@@ -118,6 +118,9 @@ public class Fund72GrabberService implements Verifiable {
                             if (aHref.exists()) {
                                 url = aHref.attr("href");
                             }
+                            if (exists(url)) {
+                                continue;
+                            }
                             String lotSource = "ФИТО";
                             TradingEntity trading = new TradingEntity();
                             trading.setCity(city.getName());
@@ -249,6 +252,10 @@ public class Fund72GrabberService implements Verifiable {
             }
         }
         return lastPage;
+    }
+
+    private boolean exists(String url) {
+        return tradingService.existsByUrl(url);
     }
 
 }

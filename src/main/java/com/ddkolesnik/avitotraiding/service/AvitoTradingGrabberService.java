@@ -201,6 +201,9 @@ public class AvitoTradingGrabberService implements Grabber, Verifiable {
         TradingEntity tradingEntity;
         Document document = getDocument(url);
         String address = getAddress(document);
+        if (exists(link)) {
+            return;
+        }
         if (!checkAddress(address, city)) {
             return;
         }
@@ -356,4 +359,8 @@ public class AvitoTradingGrabberService implements Grabber, Verifiable {
         return matcher.find();
     }
 
+    @Override
+    public boolean exists(String url) {
+        return tradingService.existsByUrl(url);
+    }
 }

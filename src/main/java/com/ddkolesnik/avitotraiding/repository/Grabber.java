@@ -18,4 +18,5 @@ public interface Grabber {
 
     int parse(Company company, City city);
 
+    boolean exists(String url);
 }

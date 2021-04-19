@@ -241,6 +241,9 @@ public class RadGrabberService implements Grabber {
      */
     private TradingEntity getAuctionInfo(String lot, String url, City city) {
         Document document = getDocument(url);
+        if (exists(url)) {
+            return null;
+        }
         if (!isProperty(document)) {
             return null;
         }
@@ -508,4 +511,8 @@ public class RadGrabberService implements Grabber {
         return true;
     }
 
+    @Override
+    public boolean exists(String url) {
+        return tradingService.existsByUrl(url);
+    }
 }

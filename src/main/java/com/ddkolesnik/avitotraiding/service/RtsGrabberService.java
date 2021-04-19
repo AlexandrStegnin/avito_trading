@@ -111,6 +111,9 @@ public class RtsGrabberService implements Verifiable {
                 lotNumber = lotUrl.split("#")[1];
                 lotUrl = lotUrl.replace("http://", "https://");
             }
+            if (exists(lotUrl)) {
+                continue;
+            }
             if (fields.size() > 10) {
                 acceptRequestsDate = fields.get(8).concat(" ").concat(fields.get(9));
             }
@@ -145,6 +148,10 @@ public class RtsGrabberService implements Verifiable {
         WebDriverRunner.getWebDriver().manage().timeouts().pageLoadTimeout(20, TimeUnit.SECONDS);
         SelenideElement process = $(By.className(processName));
         process.shouldBe(Condition.visible);
+    }
+
+    private boolean exists(String url) {
+        return tradingService.existsByUrl(url);
     }
 
 }

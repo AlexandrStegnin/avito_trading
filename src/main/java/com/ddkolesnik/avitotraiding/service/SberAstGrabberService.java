@@ -13,11 +13,13 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
 
 /**
  * @author Alexandr Stegnin
@@ -58,7 +60,10 @@ public class SberAstGrabberService {
         show100Items();
         List<SelenideElement> links = collectLinks();
         for (SelenideElement link : links) {
-            tradingEntities.add(getPageData(link, city));
+            TradingEntity entity = getPageData(link, city);
+            if (Objects.nonNull(entity)) {
+                tradingEntities.add(entity);
+            }
         }
         return tradingEntities;
     }
@@ -70,8 +75,12 @@ public class SberAstGrabberService {
         String firstUri = WebDriverRunner.getWebDriver().getWindowHandles().toArray()[0].toString();
         WebDriverRunner.getWebDriver().switchTo().window(newUri);
         $(By.cssSelector("div[id=dataPanel]")).should(Condition.visible);
+        String url = WebDriverRunner.url();
+        if (exists(url)) {
+            return null;
+        }
         TradingEntity tradingEntity = new TradingEntity();
-        tradingEntity.setUrl(WebDriverRunner.url());
+        tradingEntity.setUrl(url);
         SelenideElement lotSpan = $(By.name("DynamicControlPurchaseInfo_PurchaseCode"));
         lotSpan.should(Condition.exist);
         tradingEntity.setLot(lotSpan.text());
@@ -240,6 +249,10 @@ public class SberAstGrabberService {
     private void waiting() {
         SelenideElement ajaxBackground = $(By.cssSelector("div[id=ajax-background]"));
         ajaxBackground.should(Condition.cssValue("display", "none"));
+    }
+
+    private boolean exists(String url) {
+        return tradingService.existsByUrl(url);
     }
 
 }
