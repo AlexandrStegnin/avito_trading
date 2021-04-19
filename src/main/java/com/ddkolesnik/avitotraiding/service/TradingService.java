@@ -21,4 +21,8 @@ public class TradingService {
         return tradingRepository.save(tradingEntity);
     }
 
+    public boolean existsByUrl(String url) {
+        return tradingRepository.existsByUrl(url);
+    }
+
 }
