@@ -387,10 +387,10 @@ public class RadGrabberService implements Grabber {
         String depositAmount = "";
         Element tender = getElement(document, "div.tender");
         List<Element> spans = tender.select("span.gray1");
-        String tmp;
+        String tmp = "0";
         if (spans.size() == 11) {
             tmp = spans.get(8).text().replaceAll("\\s", "");
-        } else {
+        } else if (spans.size() > 5) {
             tmp = spans.get(5).text().replaceAll("\\s", "");
         }
         try {
