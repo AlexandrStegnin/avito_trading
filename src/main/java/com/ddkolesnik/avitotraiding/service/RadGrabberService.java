@@ -6,13 +6,13 @@ import static com.codeborne.selenide.Selenide.closeWebDriver;
 import static com.codeborne.selenide.Selenide.open;
 
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.WebDriverRunner;
 import com.ddkolesnik.avitotraiding.model.TradingEntity;
 import com.ddkolesnik.avitotraiding.repository.Grabber;
 import com.ddkolesnik.avitotraiding.utils.City;
 import com.ddkolesnik.avitotraiding.utils.Company;
-import com.gargoylesoftware.htmlunit.WebClient;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,7 +25,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
@@ -42,7 +41,6 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class RadGrabberService implements Grabber {
 
-  WebClient webClient;
   TradingService tradingService;
   DaDataService daDataService;
   ScraperApiService scraperApiService;
@@ -80,20 +78,23 @@ public class RadGrabberService implements Grabber {
     Map<String, String> links = new HashMap<>();
     open("http://sales.lot-online.ru/e-auction/lots.xhtml");
     filterPage(city);
-    while (true) {
+    int pageNumber = 1;
+    SelenideElement nextPage;
+    do {
       links.putAll(prepareLinks());
-      SelenideElement nextPage = getNextPage();
+      nextPage = getNextPage(pageNumber);
       if (nextPage.exists()) {
+        pageNumber++;
         nextPage.click();
         try {
-          Thread.sleep(3_000);
+          Thread.sleep(5_000);
         } catch (InterruptedException e) {
           log.error("Произошла ошибка: {}", e.getLocalizedMessage());
         }
       } else {
         break;
       }
-    }
+    } while (nextPage.exists());
     closeWebDriver();
     return links;
   }
@@ -183,17 +184,6 @@ public class RadGrabberService implements Grabber {
     });
 
     return linksMap;
-  }
-
-  /**
-   * Получить переключатель следующей страницы
-   *
-   * @return элемент
-   */
-  private SelenideElement getNextPage() {
-    // Находим счётчик страниц, если есть
-    SelenideElement paginator = $(By.id("formMain:LotListPaginatorID"));
-    return paginator.find(By.cssSelector("span.item.next"));
   }
 
   /**
@@ -413,23 +403,6 @@ public class RadGrabberService implements Grabber {
   }
 
   /**
-   * Метод для ожидания, в случае, если сервер сказал, что мы "спамим"
-   *
-   * @param e ошибка
-   */
-  private void waiting(HttpStatusException e) {
-    if (e.getStatusCode() == 429) {
-      log.error("Слишком много запросов {}", e.getLocalizedMessage());
-      log.info("Засыпаем на 60 мин для обхода блокировки");
-      try {
-        Thread.sleep(60 * 1000 * 60);
-      } catch (InterruptedException exception) {
-        log.error(String.format("Произошла ошибка: [%s]", exception));
-      }
-    }
-  }
-
-  /**
    * Получить стоимость лота
    *
    * @param document документ-страница
@@ -482,4 +455,12 @@ public class RadGrabberService implements Grabber {
   public boolean exists(String url) {
     return tradingService.existsByUrl(url);
   }
+
+  private SelenideElement getNextPage(int prevPageNumber) {
+    SelenideElement paginator = $(By.id("formMain:LotListPaginatorID"));
+    int nextPageNumber = prevPageNumber + 1;
+    ElementsCollection spans = paginator.$$(By.cssSelector("span.item"));
+    return spans.find(Condition.exactText(Integer.toString(nextPageNumber)));
+  }
+
 }

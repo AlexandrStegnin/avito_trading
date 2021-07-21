@@ -5,6 +5,7 @@ import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebClientOptions;
 import com.scraperapi.ScraperApiClient;
+import kong.unirest.Unirest;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +56,7 @@ public class AppConfig {
 
     @Bean
     public ScraperApiClient scraperApiClient() {
+        Unirest.config().socketTimeout(0).connectTimeout(0);
         return new ScraperApiClient(scraperApiKey);
     }
 

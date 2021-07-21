@@ -23,7 +23,7 @@ public class ScraperApiService {
 
   public Document getDocument(String url) {
     reset();
-    return Jsoup.parse(client.get(url).render(true).result());
+    return Jsoup.parse(client.get(url).timeout(0).render(true).result());
   }
 
   public void reset() {
