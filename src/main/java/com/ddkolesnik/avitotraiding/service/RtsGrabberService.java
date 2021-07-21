@@ -122,7 +122,11 @@ public class RtsGrabberService implements Verifiable {
       Element address =
           document.selectFirst("span#BaseMainContent_MainContent_ucTradeLotViewList_tlvLot_fvDeliveryAddress_lblValue");
       if (Objects.nonNull(address)) {
-        entity.setAddress(address.text());
+        String addressText = address.text();
+        if (!checkCity(addressText, city)) {
+          continue;
+        }
+        entity.setAddress(addressText);
       }
       Element description = document.selectFirst("h2#BaseMainContent_MainContent_ucTradeLotViewList_tlvLot_hLotTitle");
       if (Objects.nonNull(description)) {
