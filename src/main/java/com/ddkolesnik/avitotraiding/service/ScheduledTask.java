@@ -32,18 +32,18 @@ public class ScheduledTask {
 
     @Scheduled(cron = "${cron.expression.daily}")
     public void runDaily() {
-//        log.info("Начинаем сбор объявлений");
-//        int count = parse();
-//        log.info("Собрано лотов АВИТО: {}", count);
-//        int countRad = parseRad();
-//        log.info("Собрано лотов РАД: {}", countRad);
+        log.info("Начинаем сбор объявлений");
+        int count = parse();
+        log.info("Собрано лотов АВИТО: {}", count);
+        int countRad = parseRad();
+        log.info("Собрано лотов РАД: {}", countRad);
         int countRts = parseRts();
         log.info("Собрано лотов РТС: {}", countRts);
-//        int countFito = parseFito();
-//        log.info("Собрано лотов ФИТО: {}", countFito);
-//        int countSberAst = parseSberAst();
-//        log.info("Собрано лотов Сбер АСТ: {}", countSberAst);
-//        log.info("Завершено, собрано лотов [{} шт]", count + countRad + countRts + countFito + countSberAst);
+        int countFito = parseFito();
+        log.info("Собрано лотов ФИТО: {}", countFito);
+        int countSberAst = parseSberAst();
+        log.info("Собрано лотов Сбер АСТ: {}", countSberAst);
+        log.info("Завершено, собрано лотов [{} шт]", count + countRad + countRts + countFito + countSberAst);
     }
 
     private int parse() {
