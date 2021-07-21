@@ -1,5 +1,7 @@
 package com.ddkolesnik.avitotraiding.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -7,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Alexandr Stegnin
@@ -14,6 +17,9 @@ import java.math.BigDecimal;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "trading")
 @EqualsAndHashCode(callSuper = true)
 public class TradingEntity extends AbstractEntity {

@@ -3,6 +3,9 @@ package com.ddkolesnik.avitotraiding.service;
 import com.codeborne.selenide.WebDriverRunner;
 import com.ddkolesnik.avitotraiding.utils.City;
 import com.ddkolesnik.avitotraiding.utils.Company;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,29 +16,19 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ScheduledTask {
 
-    private final AvitoTradingGrabberService tradingGrabberService;
+    AvitoTradingGrabberService tradingGrabberService;
 
-    private final RadGrabberService radGrabberService;
+    RadGrabberService radGrabberService;
 
-    private final RtsGrabberService rtsGrabberService;
+    RtsGrabberService rtsGrabberService;
 
-    private final Fund72GrabberService fund72GrabberService;
+    Fund72GrabberService fund72GrabberService;
 
-    private final SberAstGrabberService sberAstGrabberService;
-
-    public ScheduledTask(AvitoTradingGrabberService tradingGrabberService,
-                         RadGrabberService radGrabberService,
-                         RtsGrabberService rtsGrabberService,
-                         Fund72GrabberService fund72GrabberService,
-                         SberAstGrabberService sberAstGrabberService) {
-        this.tradingGrabberService = tradingGrabberService;
-        this.radGrabberService = radGrabberService;
-        this.rtsGrabberService = rtsGrabberService;
-        this.fund72GrabberService = fund72GrabberService;
-        this.sberAstGrabberService = sberAstGrabberService;
-    }
+    SberAstGrabberService sberAstGrabberService;
 
     @Scheduled(cron = "${cron.expression.daily}")
     public void runDaily() {

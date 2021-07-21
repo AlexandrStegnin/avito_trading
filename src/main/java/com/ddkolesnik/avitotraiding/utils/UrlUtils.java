@@ -19,7 +19,7 @@ public class UrlUtils {
      * @return ссылка на страницу объявлений
      */
     public static String getUrl(Company company, City city) {
-        return "https://www.avito.ru/"
+        return "http://www.avito.ru/"
                 .concat(company.getSystemName())
                 .concat("/rossiya/kommercheskaya_nedvizhimost/")
                 .concat("prodam-ASgBAgICAUSwCNJW?f=ASgBAgICAkSwCNJW8hKg2gE")
